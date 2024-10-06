@@ -1,0 +1,1561 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Menu Control Object
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 2 : TYPE_MENUCONTROL
+//NEW SYNTAX KEY
+	private alias object.value0 : object.timer
+	private alias object.value1 : object.scrollDelayUp
+	private alias object.value2 : object.scrollDelayDown
+	private alias object.value3 : object.currentSelection
+	private alias object.value4 : object.optionchoose
+	private alias object.value5 : object.stagechoose
+	private alias object.value6 : object.extraoffset
+	private alias object.value7 : object.extratarget
+
+	private alias object.value8 : object.extrachoose	
+// Function declarations
+
+private alias 15 : ST.xspeed
+
+event ObjectMain
+object.ypos += object.yvel
+object.xpos += object.xvel
+
+	object[+1].xpos = screen.xcenter
+	object[+1].xpos += 118
+	object[+2].xpos = object[+1].xpos
+	switch object.state
+	case 0
+		object.timer = 320
+		SetScreenFade(0, 0, 0, object.timer)
+		object[+1].ypos = 88
+		object[+1].priority = PRIORITY_ACTIVE
+		object[+2].ypos = 160
+	
+		object.state++
+		break
+	case 1
+		if object.timer > 0
+			object.timer -= 16
+		else
+			PlayMusic(0)
+			object.state++
+		end if
+		SetScreenFade(0, 0, 0, object.timer)
+		break
+	case 2
+		if inputpress.left == 1
+		object.optionchoose = 1
+		PlaySfx(SfxName[Score Add], 0)			
+		end if
+
+		if inputpress.right == 1
+		object.optionchoose = 2
+		PlaySfx(SfxName[Score Add], 0)		
+		end if
+
+		if object.optionchoose == 1
+			if inputPress.start == 1
+			PlaySfx(SfxName[Lamp Post], 0)
+			object.state = 3
+			end if
+		end if	
+
+		if object.optionchoose == 2
+			if inputPress.start == 1
+			PlaySfx(SfxName[Lamp Post], 0)
+			object.state = 5
+			end if
+		end if	
+
+		if inputPress.buttonB == 1	//leave lol
+			object.state = 4
+		end if	
+	break
+	case 3	//records of secret
+		if inputPress.buttonB == 1
+			object.state = 2
+		end if		
+
+		if inputpress.right == 1
+		object.stagechoose++
+		PlaySfx(SfxName[Score Add], 0)
+		end if
+
+		if inputpress.left == 1
+		object.stagechoose--
+		PlaySfx(SfxName[Score Add], 0)
+		end if
+
+		if object.stagechoose < 0
+		object.stagechoose = 5
+		end if
+
+		if object.stagechoose > 5
+		object.stagechoose = 0
+		end if		
+
+	break
+	case 5
+	if inputpress.up == 1
+		object.extrachoose = 1
+		PlaySfx(SfxName[Score Add], 0)			
+	end if
+
+	if inputpress.down == 1
+		object.extrachoose = 2
+		PlaySfx(SfxName[Score Add], 0)		
+	end if
+
+	if object.extrachoose == 1
+		if inputPress.start == 1
+		PlaySfx(SfxName[Lamp Post], 0)
+		object.state = 6
+		end if
+	end if	
+
+		if inputPress.buttonB == 1	//leave lol
+			object.state = 2
+		end if	
+	break
+	case 6	//leave achievements
+		if inputPress.buttonB == 1	//leave lol
+			object.state = 5
+		end if	
+	break
+	case 7	//leave extras ig
+		if inputPress.buttonB == 1	//leave lol
+			object.state = 6
+		end if	
+	break
+	end switch
+end event
+
+
+event ObjectDraw
+	//set values
+	temp0 = object.extraoffset	
+	temp0 -= object.extratarget
+	Abs(temp0)
+	if temp0 < ST.xspeed // if object.extraoffset is less then ST.xspeed/15
+		object.extraoffset = object.extratarget 	// offset = target
+	else	// if its not
+		if object.extraoffset < object.extratarget // if offset is less then target
+			object.extraoffset += ST.xspeed	//go left
+		end if
+		if object.extraoffset > object.extratarget // if offset is greater then target
+			object.extraoffset -= ST.xspeed	//go right
+		end if
+	end if
+	switch object.state
+		case 5
+			object.extratarget = screen.xsize
+			object.extratarget += 20
+			break
+		case 6
+			break			
+		default
+			object.extratarget = 0
+	end switch
+
+	
+
+
+
+		switch object.state
+		case 0
+		case 1
+		case 2
+	if screen.xsize != 320
+		temp3 = screen.xcenter	
+		temp3 = 185
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(5, temp3, 55)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 115
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(0, temp3, 75)	//secret menu
+
+		
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(1, temp3, 125)		//RECORDS
+	
+
+		temp3 = screen.xcenter	
+		temp3 = 250
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(2, temp3, 125)		//B	
+
+
+		if object.optionchoose == 1
+		temp3 = screen.xcenter	
+		temp3 = 85
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(3, temp3, 125)		//A
+		end if
+
+		if object.optionchoose == 2
+		temp3 = screen.xcenter	
+		temp3 = 250
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(4, temp3, 125)		//A
+		end if	
+
+
+
+	temp0 = screen.xsize
+	temp0 *= 2
+	temp0 -= 140
+	temp0 -= object.extraoffset
+	temp1 = temp0
+	temp1 += 57
+	DrawRect(temp0, 0, 160, screen.ysize, color4, color3, color5, 255)	//xpos, ypos, xsize , ysize
+	temp0 -= 8
+	DrawSpriteScreenXY(27, temp0, 0)	//achieve
+	temp0 -= 15
+	DrawSpriteScreenXY(25, temp0, 55)	//achieve	
+	temp0 += 10
+	DrawSpriteScreenXY(28, temp0, 95)	//achieve
+
+
+
+	else	///////////////////////////320			- 50
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(5, temp3, 55)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 65
+		DrawSpriteScreenXY(0, temp3, 75)	//secret menu
+
+		
+
+		temp3 = screen.xcenter	
+		temp3 = 35
+		DrawSpriteScreenXY(1, temp3, 125)		//RECORDS
+	
+
+		temp3 = screen.xcenter	
+		temp3 = 200
+		DrawSpriteScreenXY(2, temp3, 125)		//B	
+
+
+		if object.optionchoose == 1
+		temp3 = screen.xcenter	
+		temp3 = 35
+		DrawSpriteScreenXY(3, temp3, 125)		//A
+		end if
+
+		if object.optionchoose == 2
+		temp3 = screen.xcenter	
+		temp3 = 200
+		DrawSpriteScreenXY(4, temp3, 125)		//A
+		end if
+	end if
+		break
+		case 3	//THE SECRET RECORDS
+
+	if screen.xsize != 320		//minus 50 for all
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(5, temp3, 35)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 160
+		DrawSpriteScreenXY(6, temp3, 55)	//secret menu
+
+		//row 1
+
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 1
+		temp3 = 235
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 2
+		temp3 = 265
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 3				
+
+		//row 2 please help
+
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 1
+		temp3 = 235
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 2
+		temp3 = 265
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 3			
+				
+		//row 3 WHY BRO, WHAT AM I DOING WRONG
+
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 1
+		temp3 = 235
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 2
+		temp3 = 265
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 3		
+
+		////ACT 1 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(8, temp3, 130)		//GHZ	
+
+		temp3 = screen.xcenter	
+		temp3 = 188
+		DrawSpriteScreenXY(9, temp3, 130)		//NUMBER 1		
+		
+
+		////ACT 2 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(8, temp3, 160)		//NUMBER 2	
+
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(10, temp3, 160)		//NUMBER 3				
+
+		////ACT 3 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(8, temp3, 190)		//GHZ	
+
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(11, temp3, 190)		//GHZ		
+
+
+		switch object.stagechoose	//WHAT YOU AT
+		case 0
+		temp3 = screen.xcenter	
+		temp3 = 110
+		DrawSpriteScreenXY(7, temp3, 100)		//GREEN HILL ZONE
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1900] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1901] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1902] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1903] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1904] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1905] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1906] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1907] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1908] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+		////////////////////////////
+
+		//MARBLE ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 1
+		temp3 = screen.xcenter	
+		temp3 = 130
+		DrawSpriteScreenXY(18, temp3, 100)		//MARBLE ZONE
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1909] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1910] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1911] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1912] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1913] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1914] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1915] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1916] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1917] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break		
+		////////////////////////////
+
+		//SPRING YARD ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 2	//CALM DOWN WOODY WERE YOUR FRIENDS
+		temp3 = screen.xcenter	
+		temp3 = 100
+		DrawSpriteScreenXY(20, temp3, 100)		//SPRING YARD ZONE
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1918] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1919] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1920] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1921] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1922] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1923] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1924] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1925] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1926] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break	
+		////////////////////////////
+
+		//LABYRINTH ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 3	//SHUT UP BUZZ ILL KILL YOU
+		temp3 = screen.xcenter	
+		temp3 = 115
+		DrawSpriteScreenXY(22, temp3, 100)		//LABYRINTH
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1927] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1928] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1929] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1930] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1931] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1932] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1933] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1934] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1935] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+		break	
+
+	//STAR LIGHT
+
+	case 4
+		temp3 = screen.xcenter	
+		temp3 = 110
+		DrawSpriteScreenXY(23, temp3, 100)		//GREEN HILL ZONE
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1936] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1937] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1938] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1939] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1940] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1941] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1942] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1943] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1944] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+	//SCRAP BRAIN
+
+	case 5
+		temp3 = screen.xcenter	
+		temp3 = 102
+		DrawSpriteScreenXY(24, temp3, 100)		//GREEN HILL ZONE
+
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 330
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT		
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1945] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1946] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1947] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1948] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1949] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1950] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1951] == 1
+		temp3 = screen.xcenter	
+		temp3 = 205
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1952] == 1
+		temp3 = screen.xcenter	
+		temp3 = 235
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1953] == 1
+		temp3 = screen.xcenter	
+		temp3 = 265
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+		end switch
+	else	////////////////////////////////////////////// 320 HELP ME BRO 
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(5, temp3, 35)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 110
+		DrawSpriteScreenXY(6, temp3, 55)	//secret menu
+
+		//row 1
+
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 1
+		temp3 = 185
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 2
+		temp3 = 215
+		DrawSpriteScreenXY(12, temp3, 125)		//empty secret 3				
+
+		//row 2 please help
+
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 1
+		temp3 = 185
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 2
+		temp3 = 215
+		DrawSpriteScreenXY(12, temp3, 155)		//empty secret 3			
+				
+		//row 3 WHY BRO, WHAT AM I DOING WRONG
+
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 1
+		temp3 = 185
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 2
+		temp3 = 215
+		DrawSpriteScreenXY(12, temp3, 185)		//empty secret 3		
+
+		////ACT 1 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		DrawSpriteScreenXY(8, temp3, 130)		//GHZ	
+
+		temp3 = screen.xcenter	
+		temp3 = 138
+		DrawSpriteScreenXY(9, temp3, 130)		//NUMBER 1		
+		
+
+		////ACT 2 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		DrawSpriteScreenXY(8, temp3, 160)		//NUMBER 2	
+
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(10, temp3, 160)		//NUMBER 3				
+
+		////ACT 3 + ACT WORD
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		DrawSpriteScreenXY(8, temp3, 190)		//GHZ	
+
+		temp3 = screen.xcenter	
+		temp3 = 138
+		DrawSpriteScreenXY(11, temp3, 190)		//GHZ		
+
+		temp3 = screen.xcenter	
+		temp3 = 30
+		DrawSpriteScreenXY(16, temp3, 100)		//ARROW LEFT
+
+		temp3 = screen.xcenter	
+		temp3 = 280
+		DrawSpriteScreenXY(17, temp3, 100)		//ARROW LEFT	
+
+
+		switch object.stagechoose	//WHAT YOU AT
+		case 0
+		temp3 = screen.xcenter	
+		temp3 = 60
+		DrawSpriteScreenXY(7, temp3, 100)		//GREEN HILL ZONE
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1900] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1901] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1902] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1903] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1904] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1905] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1906] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1907] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1908] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+		////////////////////////////
+
+		//MARBLE ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 1
+		temp3 = screen.xcenter	
+		temp3 = 80
+		DrawSpriteScreenXY(18, temp3, 100)		//MARBLE ZONE
+
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1909] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1910] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1911] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1912] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1913] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1914] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1915] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1916] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1917] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break		
+		////////////////////////////
+
+		//SPRING YARD ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 2	//CALM DOWN WOODY WERE YOUR FRIENDS
+		temp3 = screen.xcenter	
+		temp3 = 50
+		DrawSpriteScreenXY(20, temp3, 100)		//SPRING YARD ZONE
+
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1918] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1919] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1920] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1921] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1922] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1923] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1924] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1925] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1926] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break	
+		////////////////////////////
+
+		//LABYRINTH ZONE BELOW
+
+		////////////////////////////
+
+
+
+		case 3	//SHUT UP BUZZ ILL KILL YOU
+		temp3 = screen.xcenter	
+		temp3 = 65
+		DrawSpriteScreenXY(22, temp3, 100)		//LABYRINTH
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1927] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1928] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1929] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1930] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1931] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1932] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1933] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1934] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1935] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+		break	
+
+	case 4
+		temp3 = screen.xcenter	
+		temp3 = 65
+		DrawSpriteScreenXY(23, temp3, 100)		//STAR LIGHT
+
+	
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1936] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1937] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1938] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1939] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1940] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1941] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1942] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1943] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1944] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+	//SCRAP BRAIN
+
+	case 5
+		temp3 = screen.xcenter	
+		temp3 = 55
+		DrawSpriteScreenXY(24, temp3, 100)		//GREEN HILL ZONE
+
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1945] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 125)		//empty secret 1
+		end if
+
+		if saveRAM[1946] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 125)		//empty secret 1
+		end if		
+				
+		if saveRAM[1947] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 125)		//empty secret 1
+		end if		
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1948] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 155)		//empty secret 1
+		end if
+
+		if saveRAM[1949] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 155)		//empty secret 1
+		end if		
+				
+		if saveRAM[1950] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 155)		//empty secret 1
+		end if			
+
+		//row one fuck me bro
+		//plus 30 for each
+		if saveRAM[1951] == 1
+		temp3 = screen.xcenter	
+		temp3 = 155
+		DrawSpriteScreenXY(13, temp3, 185)		//empty secret 1
+		end if
+
+		if saveRAM[1952] == 1
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(14, temp3, 185)		//empty secret 1
+		end if		
+				
+		if saveRAM[1953] == 1
+		temp3 = screen.xcenter	
+		temp3 = 215
+		DrawSpriteScreenXY(15, temp3, 185)		//empty secret 1
+		end if	
+
+		break
+
+
+		end switch	
+	end if	
+		break
+		case 4
+	if screen.xsize != 320
+		temp3 = screen.xcenter	
+		temp3 = 185
+		DrawSpriteScreenXY(5, temp3, 55)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 115
+		DrawSpriteScreenXY(0, temp3, 75)	//secret menu
+
+		
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		DrawSpriteScreenXY(1, temp3, 125)		//RECORDS
+	
+
+		temp3 = screen.xcenter	
+		temp3 = 250
+		DrawSpriteScreenXY(2, temp3, 125)		//B	
+
+
+		if object.optionchoose == 1
+		temp3 = screen.xcenter	
+		temp3 = 85
+		DrawSpriteScreenXY(3, temp3, 125)		//A
+		end if
+
+		if object.optionchoose == 2
+		temp3 = screen.xcenter	
+		temp3 = 250
+		DrawSpriteScreenXY(4, temp3, 125)		//A
+		end if	
+	else	///////////////////////////320			- 50
+		temp3 = screen.xcenter	
+		temp3 = 135
+		DrawSpriteScreenXY(5, temp3, 55)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 65
+		DrawSpriteScreenXY(0, temp3, 75)	//secret menu
+
+		
+
+		temp3 = screen.xcenter	
+		temp3 = 35
+		DrawSpriteScreenXY(1, temp3, 125)		//RECORDS
+	
+
+		temp3 = screen.xcenter	
+		temp3 = 200
+		DrawSpriteScreenXY(2, temp3, 125)		//B	
+
+
+		if object.optionchoose == 1
+		temp3 = screen.xcenter	
+		temp3 = 35
+		DrawSpriteScreenXY(3, temp3, 125)		//A
+		end if
+
+		if object.optionchoose == 2
+		temp3 = screen.xcenter	
+		temp3 = 200
+		DrawSpriteScreenXY(4, temp3, 125)		//A
+		end if
+	end if	
+
+			if object.value0 < 320
+				object.value0 += 16
+				music.volume -= 2
+			else
+				StopMusic()
+				stage.activeList = PRESENTATION_STAGE
+				stage.listPos = 6
+				LoadStage()
+			end if
+			SetScreenFade(0, 0, 0, object.value0)
+			break
+	case 5		
+	//this leaves we dont care about this anymore
+		temp3 = screen.xcenter	
+		temp3 = 185
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(5, temp3, 55)	//egg
+
+		temp3 = screen.xcenter	
+		temp3 = 115
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(0, temp3, 75)	//secret menu
+
+		
+
+		temp3 = screen.xcenter	
+		temp3 = 85
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(1, temp3, 125)		//RECORDS
+	
+	
+		temp3 = screen.xcenter	
+		temp3 = 250
+		temp3 -= object.extraoffset
+		DrawSpriteScreenXY(4, temp3, 125)		//A
+	//dont mind above
+
+	temp0 = screen.xsize
+	temp0 *= 2
+	temp0 -= 140
+	temp0 -= object.extraoffset
+	temp1 = temp0
+	temp1 += 57
+	DrawRect(temp0, 0, 160, screen.ysize, color4, color3, color5, 255)	//xpos, ypos, xsize , ysize
+	
+	temp0 -= 8
+	DrawSpriteScreenXY(27, temp0, 0)	//achieve
+	temp0 -= 15
+	DrawSpriteScreenXY(25, temp0, 55)	//achieve
+
+	if object.extrachoose == 1
+		DrawSpriteScreenXY(26, temp0, 55)	//achieve
+	end if
+
+	temp0 += 10
+	DrawSpriteScreenXY(28, temp0, 95)	//achieve
+
+	if object.extrachoose == 2
+		DrawSpriteScreenXY(29, temp0, 95)	//achieve
+	end if	
+
+	break
+
+	case 6
+
+	temp3 = screen.xcenter	
+	temp3 = 243
+	DrawSpriteScreenXY(25, temp3, 55)	//achieve
+
+	break
+	case 7
+	temp3 = screen.xcenter	
+	temp3 = 243
+	DrawSpriteScreenXY(25, temp3, 55)	//achieve
+	break
+	end switch	
+		
+		object.drawOrder = 5
+
+		
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("SecretMenu/ObjectsStuff.gif")
+	foreach (TypeName[Menu Control], arrayPos0, ALL_ENTITIES)
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+		object[arrayPos0].drawOrder = 4
+	next
+
+	SetMusicTrack("SecretsTheme.ogg", 0, 1)
+	SpriteFrame(0, 0, 187, 18, 1, 1)	//SECRET MENU 0
+	SpriteFrame(0, 0, 110, 16, 81, 21)	//RECORDS 1
+	SpriteFrame(0, 0, 78, 16, 1, 52)	//EXTRAS 2
+
+	SpriteFrame(0, 0, 110, 16, 81, 38)	//RECORDS BUT YELLOW 3
+	SpriteFrame(0, 0, 78, 16, 1, 69)	//EXTRAS BUT YELLOW 4
+
+	SpriteFrame(0, 0, 56, 56, 194, 18)	//PURPLE BALL THING WHAT IS THIS 5
+
+	SpriteFrame(0, 0, 112, 18, 81, 55)	//RECORDS BUT PINK	6
+
+
+	SpriteFrame(0, 0, 206, 16, 1, 86)	//GREEN HILL ZONE FULL 7
+
+	SpriteFrame(0, 0, 46, 16, 208, 75)	//ACT 8
+
+	SpriteFrame(0, 0, 7, 16, 217, 92)	//1 9
+	SpriteFrame(0, 0, 14, 16, 225, 92)	//2 10
+	SpriteFrame(0, 0, 14, 16, 240, 92)	//3 11			
+
+	SpriteFrame(0, 0, 24, 24, 1, 103)	//EMPTY SECRET	12
+
+	SpriteFrame(0, 0, 24, 24, 26, 103)	//SECRET ONE	13	
+
+	SpriteFrame(0, 0, 24, 24, 51, 103)	//SECRET 2		14	
+
+	SpriteFrame(0, 0, 24, 24, 76, 103)	//SECRET TREE	15		
+	
+	SpriteFrame(0, 0, 14, 14, 127, 103)	//ARROW LEFT 16	
+
+	SpriteFrame(0, 0, 14, 14, 142, 103)	//ARROW RIGHT 17		
+
+	SpriteFrame(0, 0, 161, 16, 1, 128)	//MARBLE ZONE FULL 18
+
+	SpriteFrame(0, 0, 0, 0, 0, 0)	//BLANK
+
+	SpriteFrame(0, 0, 226, 16, 1, 145)	//SPRING YARD ZONE 20
+
+	SpriteFrame(0, 0, 0, 0, 0, 0)	//BLANK 21
+
+	SpriteFrame(0, 0, 199, 16, 1, 162)	//LABRYINTH ZONE 22	
+
+	SpriteFrame(0, 0, 204, 16, 1, 179)	//STAR LIGHT ZONE 23		
+
+	SpriteFrame(0, 0, 220, 16, 1, 196)	//SCRAP BRAIN ZONE 24	
+
+	SpriteFrame(0, 0, 177, 16, 1, 239)	//ACHIEVEMENTS 25		
+	SpriteFrame(0, 0, 177, 16, 1, 222)	//ACHIEVEMENTS BUT PISS 26	
+
+	SpriteFrame(0, 0, 8, 288, 256, 0)	//TRIANGLE 27	
+
+	SpriteFrame(0, 0, 158, 16, 1, 256)	//SECRETS RUN 28			
+	SpriteFrame(0, 0, 158, 16, 1, 273)	//SECRETS RUN PISS 29	
+	SpriteFrame(0, 0, 158, 16, 1, 290)	//SECRETS RUN YOU SUCk 30		
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

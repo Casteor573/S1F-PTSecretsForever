@@ -1,0 +1,14 @@
+
+1900 = GHZ1 Secret 1
+1901 = GHZ1 Secret 2
+1902 = GHZ1 Secret 3
+
+1903 = GHZ2 Secret 1
+1904 = GHZ2 Secret 2
+1905 = GHZ2 Secret 3
+
+1906 = GHZ3 Secret 1
+1907 = GHZ3 Secret 2
+1908 = GHZ3 Secret 3
+
+save up sorry

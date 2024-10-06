@@ -1,0 +1,85 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Buzz Bomber Shot Object
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 41 : TYPE_BUZZBOMBERSHOT
+
+
+// Static Values
+
+// Tables
+
+event ObjectMain
+	switch object.state
+	case 0
+		if object.value0 < 8
+			object.value0++
+		else
+			object.value0 = 0
+			object.state++
+			object.frame = 1
+		end if
+		break
+	case 1
+		if object.value0 < 8
+			object.value0++
+		else
+			object.value0 = 0
+			object.state++
+			object.frame = 2
+		end if
+		break
+	case 2
+		object.xpos += object.xvel
+		object.ypos += object.yvel
+		if object.value0 > 1
+			object.frame = 3
+		else
+			object.frame = 2
+		end if
+		object.value0++
+		object.value0 &= 3
+		break
+	end switch
+	if object.outOfBounds == 1
+		object.type = TypeName[Blank Object]
+	end if
+	foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+		if object.state > 0
+			BoxCollisionTest(C_TOUCH, object.entityPos, -6, -6, 6, 6, currentPlayer, object[currentPlayer].value38, object[currentPlayer].value40, object[currentPlayer].value39, object[currentPlayer].value41)
+			if checkResult == 1
+				CallFunction(PlayerObject_ProjectileHit)
+			end if
+		end if
+	next
+end event
+
+
+event ObjectDraw
+	DrawSpriteFX(object.frame, FX_FLIP, object.xpos, object.ypos)
+end event
+
+
+event ObjectStartup
+
+		LoadSpriteSheet("GHZ/Objects.gif")
+		SpriteFrame(-8, -8, 16, 16, 160, 94)
+		SpriteFrame(-7, -7, 14, 14, 177, 94)
+		SpriteFrame(-6, -6, 12, 12, 160, 111)
+		SpriteFrame(-6, -6, 12, 12, 173, 111)
+
+
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event
